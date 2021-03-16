@@ -78,4 +78,4 @@ bool checkFeatureInVector(vector<int> v, int val) {
 
 int crossValidation(){
     return 0;
-}
+} 
