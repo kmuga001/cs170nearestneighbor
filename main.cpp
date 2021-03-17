@@ -11,7 +11,7 @@ using namespace std;
 
 void search_dataset(vector< vector<double> > data);
 bool checkFeatureInVector(vector<int> v, int val);
-double leave_one_out_cross_validation(vector< vector<double> > data, vector<int> currentFeatures, int k);
+double leave_one_out_cross_validation(vector< vector<double> > data, vector<int> currentFeatures, int feature_add);
 
 
 int main() {
@@ -20,7 +20,9 @@ int main() {
     string str;
     string line;
     double tempDouble;
-    ifs.open("test95.txt");
+    //ifs.open("test95.txt");
+    //ifs.open("CS170_SMALLtestdata__42.txt");
+    ifs.open("CS170_small_special_testdata__95.txt");
     
     char delimiterSpace;
     while (getline(ifs, line)) { //get row
@@ -36,7 +38,7 @@ int main() {
 
     ifs.close();
     
-    cout << "# of Features: " << data[0].size() << endl;
+    //cout << "# of Columns: " << data[0].size() << endl;
 
     search_dataset(data);
 
@@ -47,6 +49,8 @@ int main() {
 
 void search_dataset(vector< vector<double> > data) { //remember that features start on column 1 (not 0)
     vector<int> currentFeatures;
+    double bestFinalAccuracy = 0;
+    vector<int> bestlist;
     for(int i = 1; i < data[0].size(); i++){ //data[0] because we want number of columns as those are the features' data
         cout << "I am on the " << i << "th level" << endl;
         int feature_added = 0;
@@ -60,13 +64,31 @@ void search_dataset(vector< vector<double> > data) { //remember that features st
                 if(accuracy > bestAccuracy){
                     bestAccuracy = accuracy;
                     feature_added = j;
+                    cout << "HI: " << bestAccuracy << endl;
                 }
             }
             
         }
         currentFeatures.push_back(feature_added);
+        if(bestAccuracy > bestFinalAccuracy){
+            bestFinalAccuracy = bestAccuracy;
+            bestlist = currentFeatures;
+            cout << "ULTIMATE: " << bestAccuracy << endl;
+        }
         cout << "I added feature #" << feature_added << " to the set." << endl;
+        //print feature set
+        cout << "final feature set: {";
+        for(int i = 0; i < currentFeatures.size(); i++){
+            cout << currentFeatures.at(i) << ", ";
+        }
+        cout << "}" << endl;
     }
+    cout << "The final best accuracy percentage is: " << bestFinalAccuracy << endl;
+    cout << "final feature set: {";
+    for(int i = 0; i < bestlist.size(); i++){
+        cout << bestlist.at(i) << ", ";
+    }
+    cout << "}" << endl;
 }
 
 bool checkFeatureInVector(vector<int> v, int val) {
@@ -79,7 +101,8 @@ bool checkFeatureInVector(vector<int> v, int val) {
     return false;
 }
 
-double leave_one_out_cross_validation(vector< vector<double> > data, vector<int> currentFeatures, int k) {
+double leave_one_out_cross_validation(vector< vector<double> > data, vector<int> currentFeatures, int feature_add) {
+    
     vector<double> object_to_classify;
     double num_correct = 0;
     double label_object_to_classify = 0;
@@ -103,8 +126,10 @@ double leave_one_out_cross_validation(vector< vector<double> > data, vector<int>
 
                 double sum = 0; //euclidean distance code here, need to loop to get sum of differences in data points
                 for(int j = 0; j < object_to_classify.size(); j++){
-                    double diff = object_to_classify.at(j) - currData_features.at(j);
-                    sum += pow(diff, 2);
+                    if((checkFeatureInVector(currentFeatures, j) == true) || (feature_add == j)){ //only check features in currentfeatures and feature_add, rest are ignored
+                        double diff = object_to_classify.at(j) - currData_features.at(j);
+                        sum += pow(diff, 2);
+                    }
                 }
                 distance = sqrt(sum);
 
@@ -122,6 +147,8 @@ double leave_one_out_cross_validation(vector< vector<double> > data, vector<int>
         }
 
     }
-    return num_correct/(data.size()); //returned accuracy
+    double accuracy = num_correct/(data.size());
+    //cout << "VALIDATION ACCURACY: " << accuracy << endl;
+    return accuracy; //returned accuracy
 
 }
