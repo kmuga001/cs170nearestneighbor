@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include <fstream>
 #include <vector>
 #include <string>
@@ -10,36 +11,38 @@
 using namespace std;
 
 void search_dataset(vector< vector<double> > data);
-bool checkFeatureInVector(vector<int> v, int val);
-double leave_one_out_cross_validation(vector< vector<double> > data, vector<int> currentFeatures, int feature_add);
+bool checkFeatureInVector(vector<double> v, int val);
+double leave_one_out_cross_validation(vector< vector<double> > data, vector<double> currentFeatures, int feature_add);
 
 
 int main() {
-    ifstream ifs;
+    fstream ifs;
     vector< vector<double> > data;
     string str;
     string line;
-    double tempDouble;
-    //ifs.open("test95.txt");
-    //ifs.open("CS170_SMALLtestdata__42.txt");
-    ifs.open("CS170_small_special_testdata__95.txt");
+    float tempD;
     
-    char delimiterSpace;
+    ifs.open("test95.txt");
+    //ifs.open("CS170_SMALLtestdata__42.txt");
+    //ifs.open("CS170_small_special_testdata__95.txt");
+    
+    //char delimiterSpace; --> caused the issue and took out the negative signs, don't use!!!
     while (getline(ifs, line)) { //get row
-        istringstream iss(line);
+        stringstream iss;
+        iss << line;
+        
         vector<double> inner;
-        while (iss >> tempDouble) { //get data value at column
-            inner.push_back(tempDouble);
-            iss >> delimiterSpace;
-            //cout << inner.back() << endl;
+        while (iss >> tempD) { //get data value at column--> changing negative to positive --> fix
+            cout << "TEMPD: " << tempD << endl;
+            inner.push_back(tempD);
         }
         data.push_back(inner);
     }
+    cout << data[0][0] << " " << data[0][1] << " " << data[0][2] << endl;
 
-    ifs.close();
-    
+   
     //cout << "# of Columns: " << data[0].size() << endl;
-
+    
     search_dataset(data);
 
 
@@ -48,12 +51,13 @@ int main() {
 
 
 void search_dataset(vector< vector<double> > data) { //remember that features start on column 1 (not 0)
-    vector<int> currentFeatures;
+    vector<double> currentFeatures;
     double bestFinalAccuracy = 0;
-    vector<int> bestlist;
+    vector<double> bestlist;
+    double inital_accuracy = leave_one_out_cross_validation(data, currentFeatures, 0);
     for(int i = 1; i < data[0].size(); i++){ //data[0] because we want number of columns as those are the features' data
         cout << "I am on the " << i << "th level" << endl;
-        int feature_added = 0;
+        double feature_added = 0;
         double bestAccuracy = 0;
 
         for(int j = 1; j < data[0].size(); j++) {
@@ -69,12 +73,15 @@ void search_dataset(vector< vector<double> > data) { //remember that features st
             }
             
         }
-        currentFeatures.push_back(feature_added);
+        //things are different here, need to see which features are being added when
+        
         if(bestAccuracy > bestFinalAccuracy){
             bestFinalAccuracy = bestAccuracy;
-            bestlist = currentFeatures;
+            //bestlist = currentFeatures; //might not be good - push_back(feature_added)
+            bestlist.push_back(feature_added);
             cout << "ULTIMATE: " << bestAccuracy << endl;
         }
+        currentFeatures.push_back(feature_added);
         cout << "I added feature #" << feature_added << " to the set." << endl;
         //print feature set
         cout << "final feature set: {";
@@ -86,12 +93,12 @@ void search_dataset(vector< vector<double> > data) { //remember that features st
     cout << "The final best accuracy percentage is: " << bestFinalAccuracy << endl;
     cout << "final feature set: {";
     for(int i = 0; i < bestlist.size(); i++){
-        cout << bestlist.at(i) << ", ";
+        cout << bestlist.at(i) + 1 << ", ";
     }
     cout << "}" << endl;
 }
 
-bool checkFeatureInVector(vector<int> v, int val) {
+bool checkFeatureInVector(vector<double> v, int val) {
     for(int i = 0; i < v.size(); i++){
         if(v.at(i) == val){
             return true;
@@ -101,7 +108,7 @@ bool checkFeatureInVector(vector<int> v, int val) {
     return false;
 }
 
-double leave_one_out_cross_validation(vector< vector<double> > data, vector<int> currentFeatures, int feature_add) {
+double leave_one_out_cross_validation(vector< vector<double> > data, vector<double> currentFeatures, int feature_add) {
     
     vector<double> object_to_classify;
     double num_correct = 0;
@@ -126,6 +133,7 @@ double leave_one_out_cross_validation(vector< vector<double> > data, vector<int>
 
                 double sum = 0; //euclidean distance code here, need to loop to get sum of differences in data points
                 for(int j = 0; j < object_to_classify.size(); j++){
+                    //the checkFeatureinVector function runs through the features each time --> causes slower runtime
                     if((checkFeatureInVector(currentFeatures, j) == true) || (feature_add == j)){ //only check features in currentfeatures and feature_add, rest are ignored
                         double diff = object_to_classify.at(j) - currData_features.at(j);
                         sum += pow(diff, 2);
