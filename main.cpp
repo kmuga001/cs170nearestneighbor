@@ -118,7 +118,7 @@ void search_dataset(vector< vector<double> > data, int alg) { //remember that fe
                 }
                 
             } else { //BE
-                if(checkFeatureInVector(currentFeatures, j) == true){ //check if the feature is in the currentFeatures set: true: yes
+                if(checkFeatureInVector(currentFeatures, j) == false){ //check if the feature is in the currentFeatures set
                 
                     double accuracy = leave_one_out_cross_validation(2, data, currentFeatures, j);
 
@@ -156,7 +156,7 @@ void search_dataset(vector< vector<double> > data, int alg) { //remember that fe
                 if(bestlist.size() > 1){
                     bestlist.erase(bestlist.begin() + (feature_added - 1));
                 } else {
-                    bestlist.clear();
+                    bestlist.erase(bestlist.begin());
                 }
                     
                 
@@ -174,7 +174,7 @@ void search_dataset(vector< vector<double> > data, int alg) { //remember that fe
                 currentFeatures.erase(currentFeatures.begin() + (feature_added - 1));
                 
             } else {
-                currentFeatures.clear();
+                currentFeatures.erase(currentFeatures.begin());
             }
             
         }
