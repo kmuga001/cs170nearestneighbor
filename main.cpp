@@ -126,19 +126,19 @@ void search_dataset(vector< vector<double> > data, int alg) { //remember that fe
                     for (int z = 0; z < currentFeatures.size(); z++) {
                         cout << currentFeatures.at(z) << ", ";
                     }
-                    //cout << j; //feature we are on right now
+                    cout << j; //feature we are on right now
                     cout << "} accuracy is " << accuracy << endl;
 
 
                     if(accuracy > bestAccuracy){
                         bestAccuracy = accuracy;
                         feature_added = j; //need to remove this feature as this helped improve accuracy
-                        //cout << "HI: " << bestAccuracy << endl;
+                        
                         cout << "Feature set { ";
                         for (int z = 0; z < currentFeatures.size(); z++) {
                             cout << currentFeatures.at(z) << ", ";
                         }
-                        //cout << j; //feature added that has best accuracy
+                        cout << j; //feature added that has best accuracy
                         cout << "} was best, accuracy is " << bestAccuracy << endl << endl;
                     }
                 }
