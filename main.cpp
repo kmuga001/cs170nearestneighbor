@@ -84,7 +84,7 @@ void search_dataset(vector< vector<double> > data, int alg) { //remember that fe
 
 
     double allfour_accuracy = leave_one_out_cross_validation(1, data, currentFeatures, 0);
-    cout << "Running nearest neighbor with all 4 features, using “leaving-one-out” evaluation, I get an accuracy of " << allfour_accuracy << endl;
+    //cout << "Running nearest neighbor with all 4 features, using “leaving-one-out” evaluation, I get an accuracy of " << allfour_accuracy << endl;
     for(int i = 1; i < data[0].size(); i++){ //data[0] because we want number of columns as those are the features' data
         
         double feature_added = 0;
